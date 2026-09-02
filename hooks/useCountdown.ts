@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+const EMPTY_COUNTDOWN: Countdown = { days: 0, hours: 0, minutes: 0, seconds: 0, ended: false };
+
 type Countdown = { days: number; hours: number; minutes: number; seconds: number; ended: boolean };
 
 function getCountdown(target: string): Countdown {
@@ -16,8 +18,9 @@ function getCountdown(target: string): Countdown {
 }
 
 export function useCountdown(target: string): Countdown {
-  const [countdown, setCountdown] = useState(() => getCountdown(target));
+  const [countdown, setCountdown] = useState<Countdown>(EMPTY_COUNTDOWN);
   useEffect(() => {
+    setCountdown(getCountdown(target));
     const timer = window.setInterval(() => setCountdown(getCountdown(target)), 1000);
     return () => window.clearInterval(timer);
   }, [target]);
