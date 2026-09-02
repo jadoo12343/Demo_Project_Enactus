@@ -104,7 +104,7 @@ function Footer() {
 }
 
 function App() {
-  return <div id="top" className="app-shell"><a className="skip-link" href="#main-content">Skip to content</a><Nav /><main id="main-content"><Hero /><Schedule /><Gallery /><Register /></main><Footer /></div>;
+  return <div id="top" className="app-shell"><a className="skip-link" href="#main-content">Skip to content</a><Nav /><main id="main-content"><Hero /><Gallery /><Schedule /><Register /></main><Footer /></div>;
 }
 
 export default App;
