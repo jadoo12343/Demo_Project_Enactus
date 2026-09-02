@@ -7,7 +7,6 @@ import { schedule, tracks, type Track } from '@/data/schedule';
 import { gallery } from '@/data/gallery';
 import { useCountdown } from '@/hooks/useCountdown';
 import { isValidRoll } from '@/lib/roll';
-import { getRegistrations, saveRegistration } from '@/lib/storage';
 import { Reveal } from '@/components/Reveal';
 
 function Logo() {
@@ -76,7 +75,7 @@ function RegisterForm() {
   const firstErrorRef = useRef<HTMLInputElement>(null);
   const selectedEvent = schedule.find((item) => item.id === form.eventId) ?? schedule[0];
   const update = (field: keyof typeof form, value: string) => setForm((current) => ({ ...current, [field]: value }));
-  const submit = (e: FormEvent<HTMLFormElement>) => {
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const next: Record<string, string> = {};
     if (!form.name.trim()) next.name = 'Please enter your name.';
@@ -84,13 +83,14 @@ function RegisterForm() {
     if (!isValidRoll(form.roll)) next.roll = 'Use your NSUT roll number, e.g. 2022UIC3457.';
     setErrors(next);
     if (Object.keys(next).length) { window.setTimeout(() => firstErrorRef.current?.focus(), 0); return; }
-    if (getRegistrations().some((item) => item.email.toLowerCase() === form.email.toLowerCase() && item.eventId === form.eventId)) { setErrors({ email: 'You are already registered for this event on this device.' }); return; }
     setSaving(true);
-    window.setTimeout(() => {
-      const saved = saveRegistration({ ...form, roll: form.roll.toUpperCase(), id: crypto.randomUUID(), createdAt: new Date().toISOString() });
-      setSuccess({ eventTitle: selectedEvent.title, email: form.email, storageFailed: !saved });
-      setSaving(false);
-    }, 400);
+    try {
+      const response = await fetch('/api/registrations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, roll: form.roll.toUpperCase() }) });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) { setErrors({ email: payload.error ?? 'Registration could not be completed.' }); return; }
+      setSuccess({ eventTitle: selectedEvent.title, email: form.email, storageFailed: false });
+    } catch { setErrors({ email: 'Registration is temporarily unavailable. Please try again.' }); }
+    finally { setSaving(false); }
   };
   if (success) return <div className="success-card"><div className="success-burst" aria-hidden="true"><span /><span /><span /><span /><span /><span /></div><div className="success-icon"><Check /></div><p className="eyebrow">You're on the list</p><h3>{success.eventTitle}<br /><em>is waiting for you.</em></h3><p>A confirmation has been sent to <strong>{success.email}</strong>. This is a prototype preview — no email was actually sent.</p>{success.storageFailed && <p className="storage-warning">Saved on this device failed. Please take a screenshot of this confirmation.</p>}<button className="button button-secondary" onClick={() => { setSuccess(null); setForm({ name: '', email: '', roll: '', eventId: schedule[0].id }); }}>Register another <ArrowUpRight size={16} /></button></div>;
   return <form className="register-form" onSubmit={submit} noValidate><div className="form-preview"><div className="preview-badge"><Sparkles size={14} /> Live preview</div><div className="preview-card"><span className="preview-label">YOUR PASS</span><strong>{form.name || 'Your name'}</strong><span className="preview-event">{selectedEvent.title}</span><span className="preview-roll">{form.roll || 'Roll number'}</span></div></div><div className="form-row"><label className="floating-label"><input ref={firstErrorRef} value={form.name} onChange={(e) => update('name', e.target.value)} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? 'name-error' : undefined} placeholder=" " autoComplete="name" /><span>Name</span>{errors.name && <small id="name-error">{errors.name}</small>}</label><label className="floating-label"><input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} aria-invalid={Boolean(errors.email)} aria-describedby={errors.email ? 'email-error' : undefined} placeholder=" " autoComplete="email" /><span>Email</span>{errors.email && <small id="email-error">{errors.email}</small>}</label></div><div className="form-row"><label className="floating-label"><input value={form.roll} onChange={(e) => update('roll', e.target.value.toUpperCase())} aria-invalid={Boolean(errors.roll)} aria-describedby={errors.roll ? 'roll-error' : undefined} placeholder=" " /><span>NSUT roll number</span>{errors.roll && <small id="roll-error">{errors.roll}</small>}</label><label className="floating-label"><div className={`select-wrap ${eventOpen ? 'select-open' : ''}`}><button type="button" className="event-select-trigger" aria-haspopup="listbox" aria-expanded={eventOpen} onClick={() => setEventOpen((open) => !open)}><span>{selectedEvent.title} <small>Day {selectedEvent.day}</small></span><ChevronDown size={17} /></button><span>Choose your event</span>{eventOpen && <div className="event-menu" role="listbox" aria-label="Choose your event">{schedule.map((item) => <button type="button" role="option" aria-selected={form.eventId === item.id} className={form.eventId === item.id ? 'event-option selected' : 'event-option'} key={item.id} onClick={() => { update('eventId', item.id); setEventOpen(false); }}><span><strong>{item.title}</strong><small>{item.track}</small></span><b>Day {item.day}</b></button>)}</div>}</div></label></div><button className="button button-primary submit-button" type="submit" disabled={saving}>{saving ? 'Saving your spot…' : 'Secure my spot'} <ArrowUpRight size={17} /></button><p className="form-note">No spam. Just the details you need before the gates open.</p></form>;
