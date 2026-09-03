@@ -15,8 +15,9 @@ Innovision /27 is a polished single-page event experience built to help students
 
 - **Event-first homepage** with an immersive hero, event overview, and clear registration calls to action.
 - **Live countdown** showing days, hours, minutes, and seconds until the event.
-- **Moments gallery** for visual storytelling and event atmosphere.
-- **Filterable schedule** with day and track controls.
+- **Moments gallery** for visual storytelling and event atmosphere, with every card linking directly to a relevant event brief.
+- **Filterable schedule** with day and track controls, active states, accent rails, hover motion, and keyboard focus treatment.
+- **Polished registration panel** with a live pass preview, structured event selector, inline validation, and clear submission feedback.
 - **Dedicated event pages** at `/events/[id]` with practical participation information, including:
   - What the event is about
   - What participants will do
@@ -126,7 +127,7 @@ lib/
 
 ## Design direction
 
-The interface uses a focused black, white, and orange palette inspired by campus posters, night-stage lighting, and technical exhibition graphics. The visual system prioritizes strong editorial typography, generous negative space, crisp borders, deliberate motion, and high-contrast calls to action.
+The interface uses a focused black, white, and orange palette inspired by campus posters, night-stage lighting, and technical exhibition graphics. The visual system prioritizes strong editorial typography, generous negative space, crisp borders, deliberate motion, and high-contrast calls to action. The schedule and registration surfaces are designed as practical decision-making tools, while Moments acts as a visual gateway into the event programme.
 
 ## Security notes
 
