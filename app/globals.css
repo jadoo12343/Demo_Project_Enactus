@@ -349,7 +349,7 @@ h2 { font-size:clamp(47px,6vw,82px); margin:18px 0 0; }
   .contact-grid { grid-template-columns:1fr; }
   .contact-card-featured { grid-column:auto; }
   .contact-footer { flex-direction:column; padding-top:48px; }
-  .event-menu { position:fixed; top:auto; right:16px; bottom:16px; left:16px; max-height:58vh; overflow:auto; }
+  .event-menu { position:absolute; top:calc(100% + 10px); right:0; bottom:auto; left:0; z-index:30; max-height:min(48vh,260px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; touch-action:pan-y; }
   .event-option { padding:15px 12px; }
   .nav-inner { height:72px; padding:0 22px; }
   .menu-button { display:block; }
