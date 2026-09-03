@@ -15,7 +15,7 @@ Innovision /27 is a polished single-page event experience built to help students
 
 - **Event-first homepage** with an immersive hero, event overview, and clear registration calls to action.
 - **Live countdown** showing days, hours, minutes, and seconds until the event.
-- **Moments gallery** for visual storytelling and event atmosphere, with every card linking directly to a relevant event brief.
+- **Moments gallery** for visual storytelling and event atmosphere, with each card explicitly mapped to its corresponding event brief so navigation never falls back to a random event.
 - **Filterable schedule** with day and track controls, active states, accent rails, hover motion, and keyboard focus treatment.
 - **Polished registration panel** with a live pass preview, structured event selector, inline validation, and clear submission feedback.
 - **Dedicated event pages** at `/events/[id]` with practical participation information, including:
@@ -119,6 +119,7 @@ components/
 └── innovision-app.tsx           # Interactive homepage experience
 
 data/
+├── gallery.ts                   # Explicit Moments-to-event mappings
 └── schedule.ts                  # Event schedule and metadata
 
 lib/
